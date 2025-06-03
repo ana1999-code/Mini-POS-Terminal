@@ -1,0 +1,35 @@
+unit logger;
+interface
+uses
+  System.SysUtils, System.IOUtils, System.Classes;
+
+type
+  TLogger = class
+  public
+    class procedure LogToFile(const AFileName, AMessage: string);
+  end;
+
+ const
+  LOGS_FOLDER = 'Logs'; // or whatever path you want
+
+class procedure TLogger.LogToFile(const AFileName, AMessage: string);
+var
+  FullPath: string;
+  Writer: TStreamWriter;
+begin
+  // Ensure Logs directory exists
+  if not TDirectory.Exists(LOGS_FOLDER) then
+    TDirectory.CreateDirectory(LOGS_FOLDER);
+
+  // Compose full file path
+  FullPath := IncludeTrailingPathDelimiter(LOGS_FOLDER) + AFileName;
+
+  // Open stream in append mode
+  Writer := TStreamWriter.Create(FullPath, True, TEncoding.UTF8);
+  try
+    Writer.WriteLine(FormatDateTime('yyyy-mm-dd hh:nn:ss', Now) + ' - ' + AMessage);
+  finally
+    Writer.Free;
+  end;
+end;
+

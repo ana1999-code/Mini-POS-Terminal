@@ -1,0 +1,82 @@
+unit uCsvProductLoader;
+
+interface
+
+uses
+  System.Classes, System.SysUtils, FireDAC.Comp.Client, Vcl.Graphics,
+  Vcl.Dialogs, Vcl.ExtDlgs, opendialog_u, Vcl.Forms;
+
+type
+  // Class responsible for loading product data from a CSV file into a TFDMemTable
+  TProductLoader = class
+  private
+    FCsvFilePath: string;
+    FImagesFolderPath: string;
+
+  public
+    constructor Create(const ACsvFilePath, AImagesFolderPath: string);
+    procedure LoadProductsToMemTable(ATable: TFDMemTable);
+  end;
+
+implementation
+
+constructor TProductLoader.Create(const ACsvFilePath, AImagesFolderPath
+  : string);
+begin
+  FCsvFilePath := ACsvFilePath;
+  FImagesFolderPath := AImagesFolderPath;
+end;
+
+// Parses the CSV file and loads each product into the memory table
+procedure TProductLoader.LoadProductsToMemTable(ATable: TFDMemTable);
+var
+  csvFileContent, csvLineContent: TStringList;
+  productLine: string;
+  picture: TPicture;
+  frmOpenDialog: TfrmOpenDialog;
+  selectedFile: string;
+begin
+  csvFileContent := TStringList.Create;
+  csvLineContent := TStringList.Create;
+  picture := TPicture.Create;
+  try
+    try
+      csvFileContent.LoadFromFile(FCsvFilePath);
+    except
+      // If initial file fails, show dialog to choose another
+      frmOpenDialog := TfrmOpenDialog.Create(nil);
+      try
+        if frmOpenDialog.ShowModal = 1 then
+        begin
+          selectedFile := frmOpenDialog.SelectedFile;
+          FCsvFilePath := selectedFile; // Update path to selected file
+          csvFileContent.LoadFromFile(FCsvFilePath);
+        end
+        else
+          Exit; // user aborted
+      finally
+        frmOpenDialog.Free;
+      end;
+    end;
+
+    for productLine in csvFileContent do
+    begin
+      csvLineContent.CommaText := productLine;
+      picture.LoadFromFile(FImagesFolderPath + '\' + csvLineContent[3]);
+      ATable.InsertRecord([
+        StrToInt(csvLineContent[0]),
+        csvLineContent[1],
+        StrToFloat(csvLineContent[2]),
+        picture
+      ]);
+    end;
+
+  finally
+    csvFileContent.Free;
+    csvLineContent.Free;
+    picture.Free;
+  end;
+end;
+
+
+end.

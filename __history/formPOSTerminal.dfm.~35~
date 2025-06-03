@@ -1,0 +1,207 @@
+object formProds: TformProds
+  Left = 419
+  Top = 49
+  Caption = 'Mini POS-Terminal'
+  ClientHeight = 512
+  ClientWidth = 953
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -20
+  Font.Name = 'Segoe UI'
+  Font.Style = []
+  Position = poDesigned
+  OnActivate = FormActivate
+  TextHeight = 28
+  object lbTotalPrice: TLabel
+    Left = 814
+    Top = 423
+    Width = 64
+    Height = 21
+    Alignment = taCenter
+    Caption = 'Total: $0'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Style = [fsBold, fsItalic]
+    ParentFont = False
+    OnClick = lbTotalPriceClick
+  end
+  object lbPosTerminal: TLabel
+    Left = 0
+    Top = 0
+    Width = 953
+    Height = 35
+    Align = alTop
+    Alignment = taCenter
+    Caption = 'Mini POS Terminal'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -25
+    Font.Name = 'Segoe UI'
+    Font.Style = [fsBold]
+    ParentFont = False
+    Layout = tlCenter
+    ExplicitWidth = 217
+  end
+  object prodPnl: TPanel
+    Left = 0
+    Top = 38
+    Width = 425
+    Height = 475
+    Caption = 'prodPnl'
+    TabOrder = 0
+    object lblProds: TLabel
+      Left = 168
+      Top = 6
+      Width = 83
+      Height = 28
+      Caption = 'Products'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -20
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object prodsGrid: TStringGrid
+      AlignWithMargins = True
+      Left = 0
+      Top = 40
+      Width = 425
+      Height = 433
+      BorderStyle = bsNone
+      Ctl3D = True
+      DefaultColWidth = 85
+      DefaultColAlignment = taCenter
+      DefaultRowHeight = 80
+      FixedCols = 0
+      FixedRows = 0
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -15
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      GridLineWidth = 0
+      Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRowSizing, goColSizing, goFixedRowDefAlign]
+      ParentCtl3D = False
+      ParentFont = False
+      ScrollBars = ssVertical
+      TabOrder = 0
+      OnClick = prodsGridClick
+      OnDrawCell = prodsGridDrawCell
+    end
+  end
+  object cartPnl: TPanel
+    Left = 423
+    Top = 38
+    Width = 521
+    Height = 339
+    TabOrder = 1
+    object lblCart: TLabel
+      Left = 232
+      Top = 4
+      Width = 40
+      Height = 28
+      Caption = 'Cart'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -20
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object cartGrid: TStringGrid
+      Left = 0
+      Top = 38
+      Width = 600
+      Height = 443
+      ColCount = 4
+      DefaultColWidth = 130
+      DefaultColAlignment = taCenter
+      DefaultRowHeight = 37
+      FixedCols = 0
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -15
+      Font.Name = 'He'
+      Font.Style = []
+      Options = [goFixedVertLine, goFixedHorzLine, goHorzLine, goRowMoving, goThumbTracking, goFixedRowDefAlign]
+      ParentFont = False
+      ParentShowHint = False
+      ScrollBars = ssVertical
+      ShowHint = True
+      TabOrder = 0
+      StyleElements = [seFont, seClient]
+      OnDrawCell = cartGridDrawCell
+    end
+  end
+  object spnTotal: TActivityIndicator
+    Left = 864
+    Top = 423
+    IndicatorCustomColor = clSkyBlue
+  end
+  object btnClearCart: TButton
+    Left = 552
+    Top = 450
+    Width = 130
+    Height = 40
+    Caption = 'Clear'
+    Enabled = False
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -15
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 3
+    OnClick = btnClearCartClick
+  end
+  object btnPrint: TButton
+    Left = 704
+    Top = 450
+    Width = 130
+    Height = 40
+    Caption = 'Print'
+    Enabled = False
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -15
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 4
+    OnClick = btnPrintClick
+  end
+  object productsMemTable: TFDMemTable
+    FetchOptions.AssignedValues = [evMode]
+    FetchOptions.Mode = fmAll
+    ResourceOptions.AssignedValues = [rvSilentMode]
+    ResourceOptions.SilentMode = True
+    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
+    UpdateOptions.CheckRequired = False
+    UpdateOptions.AutoCommitUpdates = True
+    Left = 440
+    Top = 448
+    object productsMemTableid: TIntegerField
+      FieldName = 'id'
+    end
+    object productsMemTablename: TStringField
+      FieldName = 'name'
+    end
+    object productsMemTableprice: TFloatField
+      FieldName = 'price'
+    end
+    object productsMemTableimage: TBlobField
+      FieldName = 'image'
+    end
+  end
+  object tmrInactivity: TTimer
+    Enabled = False
+    Interval = 10000
+    OnTimer = tmrInactivityTimer
+    Left = 440
+    Top = 416
+  end
+end

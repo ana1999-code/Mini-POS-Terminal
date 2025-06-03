@@ -1,0 +1,60 @@
+unit formOpenFileDialogOnFileError;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls;
+
+type
+  // This form is displayed when the CSV file for product import is incorrect or cannot be loaded
+  // It allows the user to either select a new valid file to import or abort the application
+  // The form contains two buttons:
+  // - btnOpen: Opens a file dialog for selecting a new CSV file
+  // - btnAbort: Terminates the application immediately
+  TfrmOpenDialog = class(TForm)
+    txtNotFound: TStaticText;
+    btnOpen: TButton;
+    btnAbort: TButton;
+    Label1: TLabel;
+    procedure btnAbortClick(Sender: TObject);
+    procedure btnOpenClick(Sender: TObject);
+  private
+    FSelectedFile: string;
+  public
+    property SelectedFile: string read FSelectedFile;
+  end;
+
+var
+  frmOpenDialog: TfrmOpenDialog;
+
+implementation
+
+{$R *.dfm}
+
+procedure TfrmOpenDialog.btnAbortClick(Sender: TObject);
+begin
+  Application.Terminate;
+end;
+
+procedure TfrmOpenDialog.btnOpenClick(Sender: TObject);
+var
+  openDialog: TOpenDialog;
+begin
+  openDialog := TOpenDialog.Create(Self);
+  try
+    openDialog.InitialDir := '.';
+    openDialog.Filter := 'All files (*.*)|*.*';
+    if openDialog.Execute then
+    begin
+      FSelectedFile := openDialog.FileName;
+      ModalResult := mrOk;
+    end;
+  finally
+    openDialog.Free;
+  end;
+end;
+
+
+end.

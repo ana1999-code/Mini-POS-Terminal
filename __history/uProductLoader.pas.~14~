@@ -1,0 +1,49 @@
+unit uProductLoader;
+
+interface
+     uses
+System.Classes, FireDAC.Comp.Client, Vcl.Graphics;
+
+type
+TProductLoader = class
+private
+FCsvFilePath : string;
+FImagesFolderPath : string;
+
+public
+    constructor Create(const ACsvFilePath, AImagesFolderPath: string);
+    procedure LoadProductsToTable(ATable: TFDMemTable);
+end;
+
+implementation
+  constructor TProductLoader.Create(const ACsvFilePath, AImagesFolderPath: string);
+begin
+  FCsvFilePath := ACsvFilePath;
+  FImagesFolderPath := AImagesFolderPath;
+end;
+
+ procedure TProductLoader.LoadProductsToTable(ATable: TFDMemTable);
+ var
+  csvFileContent, csvLineContent: TStringList;
+  productLine: string;
+  picture: TPicture;
+begin
+  csvFileContent := TStringList.Create;
+  csvLineContent := TStringList.Create;
+  picture := TPicture.Create;
+  try
+    csvFileContent.LoadFromFile(FCsvFilePath);
+    for productLine in csvFileContent do
+    begin
+      csvLineContent.CommaText := productLine;
+      picture.LoadFromFile(FImagesFolderPath + csvLineContent[3]);
+      ATable.InsertRecord([StrToInt(csvLineContent[0]), csvLineContent[1],
+        StrToFloat(csvLineContent[2]), picture]);
+    end;
+  finally
+    csvFileContent.Free;
+    csvLineContent.Free;
+    picture.Free;
+  end;
+ end;
+end.

@@ -1,0 +1,118 @@
+unit uImageCellDrawer;
+
+interface
+
+uses
+  Winapi.Windows, System.SysUtils, FireDAC.Comp.Client, Vcl.Grids, Vcl.Graphics,
+
+  System.Classes;
+
+type
+  TProdImageCellDrawer = class
+  private
+    FProdsGrid: TStringGrid;
+    FProdsMemTable: TFDMemTable;
+    FImagesFolder: string;
+    function LoadImageCell(ACol, ARow: LongInt; APicture: TPicture;
+      out AImgWidth, AImgHeight: Integer): Boolean;
+    procedure LoadImageFromFile(APicture: TPicture; AName: string;
+      out AImgWidth, AImgHeight: Integer);
+
+    function AssignImageFromTable(APicture: TPicture;
+      out AImgWidth, AImgHeight: Integer; ARow: Integer): Boolean;
+    function CenterImageRect(CellRect: TRect;
+      AImgWidth, AImgHeight: Integer): TRect;
+
+  public
+    constructor Create(const AProdsGrid: TStringGrid;
+      const AProdsMemTable: TFDMemTable; const AImagesFolder: string);
+    procedure DrawCell(ACol, ARow: Integer; Rect: TRect);
+  end;
+
+implementation
+
+constructor TProdImageCellDrawer.Create(const AProdsGrid: TStringGrid;
+  const AProdsMemTable: TFDMemTable; const AImagesFolder: string);
+begin
+  FProdsGrid := AProdsGrid;
+  FProdsMemTable := AProdsMemTable;
+  FImagesFolder := AImagesFolder;
+end;
+
+procedure TProdImageCellDrawer.DrawCell(ACol, ARow: Integer; Rect: TRect);
+var
+  picture: TPicture;
+  ImgRect: TRect;
+  ImgWidth, ImgHeight: Integer;
+begin
+  picture := TPicture.Create;
+  try
+    if not LoadImageCell(ACol, ARow, picture, ImgWidth, ImgHeight) then
+      Exit;
+
+    ImgRect := CenterImageRect(Rect, ImgWidth, ImgHeight);
+    FProdsGrid.Canvas.StretchDraw(ImgRect, picture.Graphic);
+  finally
+    picture.Free;
+  end;
+end;
+
+function TProdImageCellDrawer.LoadImageCell(ACol, ARow: LongInt;
+  APicture: TPicture; out AImgWidth, AImgHeight: Integer): Boolean;
+begin
+  Result := True;
+
+  case ACol of
+    0:
+      Result := AssignImageFromTable(APicture, AImgWidth, AImgHeight, ARow);
+    3:
+      LoadImageFromFile(APicture, 'add.png', AImgWidth, AImgHeight);
+    4:
+      LoadImageFromFile(APicture, 'minus.png', AImgWidth, AImgHeight);
+  else
+    Result := False;
+  end;
+end;
+
+function TProdImageCellDrawer.AssignImageFromTable(APicture: TPicture;
+  out AImgWidth, AImgHeight: Integer; ARow: Integer): Boolean;
+var
+  productName: string;
+  stream: TStream;
+begin
+  Result := True;
+  productName := FProdsGrid.Cells[1, ARow];
+  if FProdsMemTable.Locate('name', productName, []) then
+  begin
+    stream := FProdsMemTable.CreateBlobStream
+      (FProdsMemTable.FieldByName('image'), bmRead);
+    try
+      APicture.LoadFromStream(stream);
+      AImgWidth := 80;
+      AImgHeight := 80;
+    finally
+      stream.Free;
+    end;
+  end
+  else
+    Result := False;
+end;
+
+procedure TProdImageCellDrawer.LoadImageFromFile(APicture: TPicture;
+  AName: string; out AImgWidth, AImgHeight: Integer);
+begin
+  APicture.LoadFromFile(FImagesFolder + '\' + AName);
+  AImgWidth := 50;
+  AImgHeight := 50;
+end;
+
+function TProdImageCellDrawer.CenterImageRect(CellRect: TRect;
+  AImgWidth, AImgHeight: Integer): TRect;
+begin
+  Result.Left := CellRect.Left + (CellRect.Width - AImgWidth) div 2;
+  Result.Top := CellRect.Top + (CellRect.Height - AImgHeight) div 2;
+  Result.Right := Result.Left + AImgWidth;
+  Result.Bottom := Result.Top + AImgHeight;
+end;
+
+end.

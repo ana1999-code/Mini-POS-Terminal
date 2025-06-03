@@ -1,0 +1,80 @@
+unit uPrinter;
+
+interface
+
+uses
+  System.SysUtils, System.JSON, Vcl.Grids, System.IOUtils;
+
+type
+  TPrinter = class
+  private
+    FCartGrid: TStringGrid;
+    FTotalPrice: double;
+    FReceiptsFolder: string;
+    function AddProduct(name: string; price: string; quantity: Integer;
+      totalProdPrice: string): TJSONOBject;
+    function AddProducts: TJSONArray;
+  public
+    constructor Create(const ACartGrid: TStringGrid; const ATotalPrice: double; const AReceiptsFolder: string);
+    procedure PrintCartProductsToJsonFile;
+  end;
+
+implementation
+
+constructor TPrinter.Create(const ACartGrid: TStringGrid; const ATotalPrice: double; const AReceiptsFolder: string);
+begin
+  FCartGrid := ACartGrid;
+   FTotalPrice :=  ATotalPrice;
+   FReceiptsFolder :=AReceiptsFolder;
+end;
+
+procedure TPrinter.PrintCartProductsToJsonFile;
+var
+  cartJsonObject: TJSONOBject;
+  dateTime: TDateTime;
+begin
+  cartJsonObject := TJSONOBject.Create;
+  dateTime := Now;
+  try
+    cartJsonObject.AddPair('products', AddProducts);
+    cartJsonObject.AddPair('totalPrice', '$' + FloatToStr(FTotalPrice));
+
+    if not TDirectory.Exists(FReceiptsFolder) then
+      TDirectory.CreateDirectory(FReceiptsFolder);
+
+    TFile.WriteAllText(FReceiptsFolder + '\Receipt' +
+      FormatDateTime('yyyy-mm-dd_hh-nn-ss', dateTime) + '.json',
+      cartJsonObject.Format, TEncoding.UTF8);
+  finally
+    cartJsonObject.Free;
+  end;
+end;
+
+function TPrinter.AddProducts: TJSONArray;
+var
+  products: TJSONArray;
+  i: Integer;
+begin
+  products := TJSONArray.Create;
+  for i := 1 to FCartGrid.RowCount - 1 do
+
+    products.Add(AddProduct(FCartGrid.Cells[0, i], FCartGrid.Cells[1, i],
+      StrToInt(FCartGrid.Cells[2, i]), FCartGrid.Cells[3, i]));
+
+  Result := products;
+end;
+
+function TPrinter.AddProduct(name: string; price: string; quantity: Integer;
+  totalProdPrice: string): TJSONOBject;
+var
+  product: TJSONOBject;
+begin
+  product := TJSONOBject.Create;
+  product.AddPair('name', name);
+  product.AddPair('price', price);
+  product.AddPair('quantity', TJSONNumber.Create(quantity));
+  product.AddPair('total', totalProdPrice);
+  Result := product;
+end;
+
+end.

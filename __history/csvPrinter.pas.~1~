@@ -1,0 +1,89 @@
+unit printer;
+
+interface
+
+uses
+  System.SysUtils, System.JSON, Vcl.Grids, System.IOUtils;
+
+type
+// Class responsible for exporting the shopping cart data into a JSON file (receipt)
+  TPrinter = class
+  private
+    FCartGrid: TStringGrid;
+    FTotalPrice: double;
+    FReceiptsFolder: string;
+    function AddProduct(name: string; price: string; quantity: Integer;
+      totalProdPrice: string): TJSONOBject;
+    function AddProducts: TJSONArray;
+  public
+    constructor Create(const ACartGrid: TStringGrid; const ATotalPrice: double;
+      const AReceiptsFolder: string);
+    procedure PrintCartProductsToJsonFile;
+  end;
+
+implementation
+
+constructor TPrinter.Create(const ACartGrid: TStringGrid;
+  const ATotalPrice: double; const AReceiptsFolder: string);
+begin
+  FCartGrid := ACartGrid;
+  FTotalPrice := ATotalPrice;
+  FReceiptsFolder := AReceiptsFolder;
+end;
+
+// Writes the cart products and total price to a JSON file
+procedure TPrinter.PrintCartProductsToJsonFile;
+var
+  cartJsonObject: TJSONOBject;
+  dateTime: TDateTime;
+begin
+  cartJsonObject := TJSONOBject.Create;
+  dateTime := Now;
+  try
+    // Add product array and total price to the main JSON object
+    cartJsonObject.AddPair('products', AddProducts);
+    cartJsonObject.AddPair('totalPrice', '$' + FloatToStr(FTotalPrice));
+
+    // Create receipts directory if it does not exist
+    if not TDirectory.Exists(FReceiptsFolder) then
+      TDirectory.CreateDirectory(FReceiptsFolder);
+
+    // Save the JSON to a file with a timestamp in its name
+    TFile.WriteAllText(FReceiptsFolder + '\Receipt' +
+      FormatDateTime('yyyy-mm-dd_hh-nn-ss', dateTime) + '.json',
+      cartJsonObject.Format, TEncoding.UTF8);
+  finally
+    cartJsonObject.Free;
+  end;
+end;
+
+// Builds and returns a JSON array with all products from the cart
+function TPrinter.AddProducts: TJSONArray;
+var
+  products: TJSONArray;
+  i: Integer;
+begin
+  products := TJSONArray.Create;
+  for i := 1 to FCartGrid.RowCount - 1 do
+
+    products.Add(AddProduct(FCartGrid.Cells[0, i], FCartGrid.Cells[1, i],
+      StrToInt(FCartGrid.Cells[2, i]), FCartGrid.Cells[3, i]));
+
+  Result := products;
+end;
+
+// Creates a JSON object for a single product
+function TPrinter.AddProduct(name: string; price: string; quantity: Integer;
+  totalProdPrice: string): TJSONOBject;
+var
+  product: TJSONOBject;
+begin
+  product := TJSONOBject.Create;
+  product.AddPair('name', name);
+  product.AddPair('price', price);
+  product.AddPair('quantity', TJSONNumber.Create(quantity));
+  product.AddPair('total', totalProdPrice);
+  Result := product;
+end;
+
+end.

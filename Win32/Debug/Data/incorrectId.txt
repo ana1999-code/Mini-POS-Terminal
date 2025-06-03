@@ -1,0 +1,1 @@
+id,milk,20,milk.png

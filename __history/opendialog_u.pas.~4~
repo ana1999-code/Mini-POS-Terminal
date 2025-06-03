@@ -1,0 +1,54 @@
+unit opendialog_u;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls;
+
+type
+  TfrmOpenDialog = class(TForm)
+    txtNotFound: TStaticText;
+    btnOpen: TButton;
+    btnAbort: TButton;
+    procedure btnAbortClick(Sender: TObject);
+    procedure btnOpenClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmOpenDialog: TfrmOpenDialog;
+
+implementation
+
+{$R *.dfm}
+
+procedure TfrmOpenDialog.btnAbortClick(Sender: TObject);
+begin
+  Application.Terminate;
+end;
+
+procedure TfrmOpenDialog.btnOpenClick(Sender: TObject);
+var
+  openDialog: TOpenDialog;
+begin
+  openDialog := TOpenDialog.Create(nil);
+  try
+    openDialog.InitialDir := '.';
+    openDialog.Filter := 'All files (*.*)|*.*';
+    if openDialog.Execute then
+      ShowMessage('File : ' + openDialog.FileName)
+    else
+      ShowMessage('Open file was cancelled');
+
+  finally
+    openDialog.Free;
+  end;
+
+end;
+
+end.

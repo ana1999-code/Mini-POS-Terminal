@@ -1,0 +1,15 @@
+program pos_p;
+
+uses
+  Vcl.Forms,
+  pos_u in 'pos_u.pas' {formProds},
+  Product_Unit in 'Product_Unit.pas';
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TformProds, formProds);
+  Application.Run;
+end.

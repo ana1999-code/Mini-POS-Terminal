@@ -1,0 +1,56 @@
+object frmOpenDialog: TfrmOpenDialog
+  Left = 0
+  Top = 0
+  Caption = 'frmOpenDialog'
+  ClientHeight = 303
+  ClientWidth = 495
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -12
+  Font.Name = 'Segoe UI'
+  Font.Style = []
+  TextHeight = 15
+  object txtNotFound: TStaticText
+    Left = 176
+    Top = 96
+    Width = 133
+    Height = 24
+    Caption = 'Data file not found.'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = 20
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 0
+  end
+  object btnOpen: TButton
+    Left = 64
+    Top = 152
+    Width = 153
+    Height = 57
+    Caption = 'Open Data file'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = 20
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 1
+  end
+  object btnAbort: TButton
+    Left = 272
+    Top = 152
+    Width = 153
+    Height = 57
+    Caption = 'Close POS Terminal'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = 20
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 2
+  end
+end

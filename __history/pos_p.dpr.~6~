@@ -1,0 +1,16 @@
+program pos_p;
+
+uses
+  Vcl.Forms,
+  pos_u in 'pos_u.pas' {formProds},
+  uCsvProductLoader in 'uCsvProductLoader.pas',
+  uPrinter in 'uPrinter.pas';
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TformProds, formProds);
+  Application.Run;
+end.

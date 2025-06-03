@@ -1,0 +1,73 @@
+object frmOpenDialog: TfrmOpenDialog
+  Left = 678
+  Top = 229
+  BorderStyle = bsNone
+  Caption = 'frmOpenDialog'
+  ClientHeight = 229
+  ClientWidth = 477
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -12
+  Font.Name = 'Segoe UI'
+  Font.Style = []
+  Position = poDesigned
+  TextHeight = 15
+  object Label1: TLabel
+    Left = 49
+    Top = 88
+    Width = 369
+    Height = 20
+    Caption = 'Click on Import to import valid file or close the terminal'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -15
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
+  end
+  object txtNotFound: TStaticText
+    Left = 144
+    Top = 50
+    Width = 172
+    Height = 32
+    Caption = 'Data file not found.'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -20
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 0
+  end
+  object btnOpen: TButton
+    Left = 72
+    Top = 128
+    Width = 130
+    Height = 40
+    Caption = 'Import File'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = 20
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 1
+    OnClick = btnOpenClick
+  end
+  object btnAbort: TButton
+    Left = 256
+    Top = 128
+    Width = 130
+    Height = 40
+    Caption = 'Close Terminal'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = 20
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 2
+    OnClick = btnAbortClick
+  end
+end

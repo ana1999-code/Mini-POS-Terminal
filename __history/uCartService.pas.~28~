@@ -1,0 +1,127 @@
+unit uCartService;
+
+interface
+
+uses
+  System.SysUtils, Vcl.Grids;
+
+type
+  // Service class to manage shopping cart operations (add, remove)
+  TCartOperationService = class
+  private
+    FCartGrid: TStringGrid;
+    FTotalPrice: Double;
+    function AddProductToCart(const AName: string; APrice: Double): Double;
+    function DecreaseOrRemoveProductFromCart(const AName: string;
+      APrice: Double): Double;
+    procedure RemoveProductFromCart(ARowIndex: Integer);
+    procedure UpdateCartRow(ARowIndex, ANewQuantity: Integer;
+      AUnitPrice: Double);
+
+  public
+    constructor Create(const ACartGrid: TStringGrid; const ATotalPrice: Double);
+    function HandleGridSelectCell(ACol: Integer; AProductName: string;
+      AProductPrice: Double): Double;
+  end;
+
+implementation
+
+constructor TCartOperationService.Create(const ACartGrid: TStringGrid;
+  const ATotalPrice: Double);
+begin
+  FCartGrid := ACartGrid;
+  FTotalPrice := ATotalPrice;
+end;
+
+// Handles clicks in the grid: column 3 = Add, column 4 = Decrease/Remove
+function TCartOperationService.HandleGridSelectCell(ACol: Integer;
+  AProductName: string; AProductPrice: Double): Double;
+begin
+
+  case ACol of
+    3:
+      FTotalPrice := AddProductToCart(AProductName, AProductPrice);
+    4:
+      FTotalPrice := DecreaseOrRemoveProductFromCart(AProductName,
+        AProductPrice);
+  end;
+  Sleep(1000);
+  Result := FTotalPrice;
+end;
+
+// Adds product to cart or increases its quantity if it already exists
+function TCartOperationService.AddProductToCart(const AName: string;
+  APrice: Double): Double;
+var
+  i: Integer;
+begin
+  Result := FTotalPrice + APrice;
+
+  // Check if the product is already in the cart
+  for i := 1 to FCartGrid.RowCount - 1 do
+  begin
+    if FCartGrid.Cells[0, i] = AName then
+    begin
+      // Product found, update quantity and total price
+      UpdateCartRow(i, StrToInt(FCartGrid.Cells[2, i]) + 1, APrice);
+      Exit;
+    end;
+  end;
+
+  // Product not found, add new row
+  i := FCartGrid.RowCount;
+  FCartGrid.RowCount := i + 1;
+  FCartGrid.Cells[0, i] := AName;
+  FCartGrid.Cells[1, i] := FormatFloat('$#,##0.00', APrice);
+  FCartGrid.Cells[2, i] := '1';
+  FCartGrid.Cells[3, i] := FormatFloat('$#,##0.00', APrice);
+end;
+
+// Decreases the quantity of a product or removes it if quantity becomes zero
+function TCartOperationService.DecreaseOrRemoveProductFromCart
+  (const AName: string; APrice: Double): Double;
+var
+  i: Integer;
+  quantity: Integer;
+begin
+  for i := 1 to FCartGrid.RowCount - 1 do
+  begin
+    if FCartGrid.Cells[0, i] = AName then
+    begin
+      quantity := StrToInt(FCartGrid.Cells[2, i]);
+      Result := FTotalPrice - APrice;
+
+      if quantity > 1 then
+        //Quantity is more than 1, update the quantity and total price
+        UpdateCartRow(i, quantity - 1, APrice)
+      else
+        //Quantity is 1, delete the product
+        RemoveProductFromCart(i);
+
+      Exit;
+    end;
+  end;
+end;
+
+// Updates the quantity and total price
+procedure TCartOperationService.UpdateCartRow(ARowIndex, ANewQuantity: Integer;
+  AUnitPrice: Double);
+begin
+  FCartGrid.Cells[2, ARowIndex] := IntToStr(ANewQuantity);
+  FCartGrid.Cells[3, ARowIndex] := FormatFloat('$#,##0.00',
+    ANewQuantity * AUnitPrice);
+end;
+
+// Removes a product from the cart
+procedure TCartOperationService.RemoveProductFromCart(ARowIndex: Integer);
+var
+  i, j: Integer;
+begin
+  for i := ARowIndex to FCartGrid.RowCount - 2 do
+    for j := 0 to FCartGrid.ColCount - 1 do
+      FCartGrid.Cells[j, i] := FCartGrid.Cells[j, i + 1];
+
+  FCartGrid.RowCount := FCartGrid.RowCount - 1;
+end;
+
+end.

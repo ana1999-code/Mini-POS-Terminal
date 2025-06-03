@@ -1,0 +1,52 @@
+unit formInactivityDialog;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls;
+
+type
+  TfrmInactivityDialog = class(TForm)
+    lblCountdown: TLabel;
+    countdownTimer: TTimer;
+    btnCancel: TButton;
+    procedure CountdownTimerTimer(Sender: TObject);
+  private
+    FSecondsLeft: Integer;
+  public
+    procedure StartCountdown;
+  end;
+
+var
+  frmInactivityDialog: TfrmInactivityDialog;
+
+implementation
+
+{$R *.dfm}
+
+procedure TfrmInactivityDialog.StartCountdown;
+begin
+  FSecondsLeft := 5;
+  lblCountdown.Caption := 'Clearing data in ' + IntToStr(FSecondsLeft) +
+    ' seconds...';
+  CountdownTimer.Interval := 1000;
+  CountdownTimer.Enabled := True;
+end;
+
+procedure TfrmInactivityDialog.CountdownTimerTimer(Sender: TObject);
+begin
+  Dec(FSecondsLeft);
+  if FSecondsLeft > 0 then
+    lblCountdown.Caption := 'Clearing data in ' + IntToStr(FSecondsLeft) +
+      ' seconds...'
+  else
+  begin
+    CountdownTimer.Enabled := False;
+    ModalResult := mrOk;
+    Close;
+  end;
+end;
+
+end.

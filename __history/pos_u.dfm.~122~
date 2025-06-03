@@ -1,0 +1,173 @@
+object formProds: TformProds
+  Left = 419
+  Top = 49
+  Caption = 'POS'
+  ClientHeight = 646
+  ClientWidth = 947
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -20
+  Font.Name = 'Segoe UI'
+  Font.Style = []
+  Position = poDesigned
+  OnActivate = FormActivate
+  TextHeight = 28
+  object lbTotalPrice: TLabel
+    Left = 768
+    Top = 543
+    Width = 85
+    Height = 28
+    Alignment = taCenter
+    Caption = 'Total: 0$'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -20
+    Font.Name = 'Segoe UI'
+    Font.Style = [fsBold, fsItalic]
+    ParentFont = False
+    OnClick = lbTotalPriceClick
+  end
+  object prodPnl: TPanel
+    Left = 0
+    Top = 38
+    Width = 425
+    Height = 475
+    Caption = 'prodPnl'
+    TabOrder = 0
+    object lblProds: TLabel
+      Left = 168
+      Top = 6
+      Width = 83
+      Height = 28
+      Caption = 'Products'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -20
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object prodsGrid: TStringGrid
+      AlignWithMargins = True
+      Left = 0
+      Top = 40
+      Width = 425
+      Height = 433
+      BorderStyle = bsNone
+      Ctl3D = True
+      DefaultColWidth = 85
+      DefaultColAlignment = taCenter
+      DefaultRowHeight = 80
+      FixedCols = 0
+      FixedRows = 0
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -15
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      GridLineWidth = 0
+      Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRowSizing, goColSizing, goFixedRowDefAlign]
+      ParentCtl3D = False
+      ParentFont = False
+      ScrollBars = ssVertical
+      TabOrder = 0
+      OnDrawCell = prodsGridDrawCell
+      OnSelectCell = prodsGridSelectCell
+    end
+  end
+  object cartPnl: TPanel
+    Left = 423
+    Top = 38
+    Width = 521
+    Height = 475
+    Caption = 'cartPnl'
+    TabOrder = 1
+    object lblCart: TLabel
+      Left = 232
+      Top = 4
+      Width = 40
+      Height = 28
+      Caption = 'Cart'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -20
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object cartGrid: TStringGrid
+      Left = 0
+      Top = 38
+      Width = 600
+      Height = 443
+      ColCount = 4
+      DefaultColWidth = 130
+      DefaultColAlignment = taCenter
+      DefaultRowHeight = 37
+      FixedCols = 0
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -15
+      Font.Name = 'He'
+      Font.Style = []
+      Options = [goFixedVertLine, goFixedHorzLine, goHorzLine, goFixedRowDefAlign]
+      ParentFont = False
+      TabOrder = 0
+      StyleElements = [seFont, seClient]
+      OnDrawCell = cartGridDrawCell
+    end
+  end
+  object spnTotal: TActivityIndicator
+    Left = 912
+    Top = 543
+    IndicatorCustomColor = clSkyBlue
+  end
+  object btnClearCart: TButton
+    Left = 256
+    Top = 543
+    Width = 153
+    Height = 65
+    Caption = 'Clear Cart'
+    Enabled = False
+    TabOrder = 3
+    OnClick = btnClearCartClick
+  end
+  object btnPrint: TButton
+    Left = 464
+    Top = 543
+    Width = 175
+    Height = 65
+    Caption = 'Print'
+    Enabled = False
+    TabOrder = 4
+    OnClick = btnPrintClick
+  end
+  object productsMemTable: TFDMemTable
+    FetchOptions.AssignedValues = [evMode]
+    FetchOptions.Mode = fmAll
+    ResourceOptions.AssignedValues = [rvSilentMode]
+    ResourceOptions.SilentMode = True
+    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
+    UpdateOptions.CheckRequired = False
+    UpdateOptions.AutoCommitUpdates = True
+    Top = 528
+    object productsMemTableid: TIntegerField
+      FieldName = 'id'
+    end
+    object productsMemTablename: TStringField
+      FieldName = 'name'
+    end
+    object productsMemTableprice: TFloatField
+      FieldName = 'price'
+    end
+    object productsMemTableimage: TBlobField
+      FieldName = 'image'
+    end
+  end
+  object Timer1: TTimer
+    Interval = 3600
+    OnTimer = Timer1Timer
+    Top = 584
+  end
+end

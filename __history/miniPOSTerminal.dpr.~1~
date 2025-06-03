@@ -1,0 +1,23 @@
+program pos_p;
+
+uses
+  Vcl.Forms,
+  miniPOSTerminal in 'miniPOSTerminal.pas' {formProds},
+  csvProductLoader in 'csvProductLoader.pas',
+  printer in 'printer.pas',
+  cartService in 'cartService.pas',
+  imageCellDrawer in 'imageCellDrawer.pas',
+  logger in 'logger.pas',
+  formReceiptProcess in 'formReceiptProcess.pas' {frmProcessing},
+  formOpenDialog in 'formOpenDialog.pas' {frmOpenDialog};
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TformProds, formProds);
+  Application.CreateForm(TfrmProcessing, frmProcessing);
+  Application.CreateForm(TfrmOpenDialog, frmOpenDialog);
+  Application.Run;
+end.

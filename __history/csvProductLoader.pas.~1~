@@ -1,0 +1,126 @@
+unit uCsvProductLoader;
+
+interface
+
+uses
+  System.Classes, System.SysUtils, FireDAC.Comp.Client, Vcl.Graphics,
+  Vcl.Dialogs, Vcl.ExtDlgs, opendialog_u, Vcl.Forms;
+
+type
+  // Class responsible for loading product data from a CSV file into a TFDMemTable
+  TProductLoader = class
+  private
+    FCsvFilePath: string;
+    FImagesFolderPath: string;
+
+  public
+    constructor Create(const ACsvFilePath, AImagesFolderPath: string);
+    procedure LoadProductsToMemTable(ATable: TFDMemTable);
+  end;
+
+implementation
+
+constructor TProductLoader.Create(const ACsvFilePath, AImagesFolderPath
+  : string);
+begin
+  FCsvFilePath := ACsvFilePath;
+  FImagesFolderPath := AImagesFolderPath;
+end;
+
+procedure TProductLoader.LoadProductsToMemTable(ATable: TFDMemTable);
+var
+  csvFileContent, csvLineContent: TStringList;
+  productLine: string;
+  picture: TPicture;
+  frmOpenDialog: TfrmOpenDialog;
+  selectedFile: string;
+  retry: Boolean;
+  lineIndex: Integer;
+  productId: Integer;
+  productPrice: Double;
+begin
+  csvFileContent := TStringList.Create;
+  csvLineContent := TStringList.Create;
+  picture := TPicture.Create;
+
+  try
+    retry := True;
+
+    while retry do
+    begin
+      retry := False;
+      try
+        csvFileContent.LoadFromFile(FCsvFilePath);
+
+        // Check if file is empty
+        if csvFileContent.Count = 0 then
+          raise Exception.Create('File is empty');
+
+        ATable.DisableControls;
+        ATable.EmptyDataSet;
+
+        for lineIndex := 0 to csvFileContent.Count - 1 do
+        begin
+          productLine := csvFileContent[lineIndex];
+          csvLineContent.CommaText := productLine;
+
+          // Validate that the line contains exactly 4 fields
+          if csvLineContent.Count <> 4 then
+            raise Exception.CreateFmt('Invalid line format at line %d: %s',
+              [lineIndex + 1, productLine]);
+
+          // Validate and parse product ID
+          if not TryStrToInt(csvLineContent[0], productId) then
+            raise Exception.CreateFmt('Invalid product id at line %d: %s',
+              [lineIndex + 1, productLine]);
+
+          // Validate and parse product price
+          if not TryStrToFloat(csvLineContent[2], productPrice) then
+            raise Exception.CreateFmt('Invalid product price at line %d: %s',
+              [lineIndex + 1, productLine]);
+
+          // Load the product image
+          try
+            picture.LoadFromFile(FImagesFolderPath + '\' + csvLineContent[3]);
+          except
+            on E: Exception do
+              raise Exception.CreateFmt('Failed to load image for line %d: %s',
+                [lineIndex + 1, E.Message]);
+          end;
+
+          ATable.InsertRecord([productId, csvLineContent[1], productPrice,
+            picture]);
+        end;
+
+      except
+        // Show error message and prompt user to select a different file
+        on E: Exception do
+        begin
+          MessageDlg('Error: ' + E.Message, mtError, [mbOk], 0);
+
+          frmOpenDialog := TfrmOpenDialog.Create(nil);
+          try
+            if frmOpenDialog.ShowModal = 1 then
+            begin
+              selectedFile := frmOpenDialog.selectedFile;
+              FCsvFilePath := selectedFile;
+              retry := True;
+            end
+            else
+              Exit;
+          finally
+            frmOpenDialog.Free;
+          end;
+        end;
+      end;
+    end;
+
+  finally
+    picture.Free;
+    csvLineContent.Free;
+    csvFileContent.Free;
+    ATable.EnableControls;
+  end;
+end;
+
+end.

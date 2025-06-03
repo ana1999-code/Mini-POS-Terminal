@@ -1,0 +1,37 @@
+unit process_u;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.WinXCtrls,
+  Vcl.ExtCtrls, Vcl.Imaging.pngimage;
+
+type
+  TfrmProcessing = class(TForm)
+    lbProcess: TLabel;
+    spnProcessing: TActivityIndicator;
+    imgCheck: TImage;
+    btnClose: TButton;
+    pnlProcess: TPanel;
+    procedure btnCloseClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmProcessing: TfrmProcessing;
+
+implementation
+
+{$R *.dfm}
+
+procedure TfrmProcessing.btnCloseClick(Sender: TObject);
+begin
+  Close;
+end;
+
+end.

@@ -1,0 +1,23 @@
+program pos_p;
+
+uses
+  Vcl.Forms,
+  pos_u in 'pos_u.pas' {formProds},
+  uCsvProductLoader in 'uCsvProductLoader.pas',
+  uPrinter in 'uPrinter.pas',
+  uCartService in 'uCartService.pas',
+  uImageCellDrawer in 'uImageCellDrawer.pas',
+  uLogger in 'uLogger.pas',
+  process_u in 'process_u.pas' {frmProcessing},
+  opendialog_u in 'opendialog_u.pas' {frmOpenDialog};
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TformProds, formProds);
+  Application.CreateForm(TfrmProcessing, frmProcessing);
+  Application.CreateForm(TfrmOpenDialog, frmOpenDialog);
+  Application.Run;
+end.

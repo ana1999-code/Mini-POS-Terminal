@@ -1,0 +1,12 @@
+unit logger;
+
+interface
+
+type
+TLogger = class
+
+end;
+
+implementation
+
+end.

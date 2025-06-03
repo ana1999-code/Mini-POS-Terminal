@@ -1,0 +1,74 @@
+unit uPrinter;
+
+interface
+
+uses
+  System.JSON, Vcl.Grids, System;
+
+type
+  TPrinter = class
+  private
+    FCartGrid: TStringGrid;
+    function AddProduct(name: string; price: string; quantity: Integer;
+      totalProdPrice: string): TJSONOBject;
+    function AddProducts: TJSONArray;
+  public
+    constructor Create(const ACartGrid: TStringGrid);
+    procedure PrintCartProductsToJsonFile;
+  end;
+
+implementation
+
+constructor TPrinter.Create(const ACartGrid: TStringGrid);
+begin
+  FCartGrid := ACartGrid;
+end;
+
+procedure TPrinter.PrintCartProductsToJsonFile;
+var
+  cartJsonObject: TJSONOBject;
+  dateTime: TDateTime;
+begin
+  cartJsonObject := TJSONOBject.Create;
+  dateTime := Now;
+  try
+    cartJsonObject.AddPair('products', AddProducts);
+    cartJsonObject.AddPair('totalPrice', '$' + FloatToStr(totalPrice));
+    if not TDirectory.Exists('Receipts') then
+      TDirectory.CreateDirectory('Receipts');
+    TFile.WriteAllText('Receipts\Receipt' +
+      FormatDateTime('yyyy-mm-dd_hh-nn-ss', dateTime) + '.json',
+      cartJsonObject.Format, TEncoding.UTF8);
+  finally
+    cartJsonObject.Free;
+  end;
+end;
+
+function TPrinter.AddProducts: TJSONArray;
+var
+  products: TJSONArray;
+  i: Integer;
+begin
+  products := TJSONArray.Create;
+  for i := 1 to cartGrid.RowCount - 1 do
+
+    products.Add(AddProduct(cartGrid.Cells[0, i], cartGrid.Cells[1, i],
+      StrToInt(cartGrid.Cells[2, i]), cartGrid.Cells[3, i]));
+
+  Result := products;
+end;
+
+function TPrinter.AddProduct(name: string; price: string; quantity: Integer;
+  totalProdPrice: string): TJSONOBject;
+var
+  product: TJSONOBject;
+begin
+  product := TJSONOBject.Create;
+  product.AddPair('name', name);
+  product.AddPair('price', price);
+  product.AddPair('quantity', TJSONNumber.Create(quantity));
+  product.AddPair('total', totalProdPrice);
+  Result := product;
+end;
+
+end.

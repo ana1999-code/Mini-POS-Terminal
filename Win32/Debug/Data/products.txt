@@ -1,0 +1,11 @@
+1,Cheese,41.70,cheese.png
+2,Milk,30,milk.png
+3,Biscuit,50,biscuit.png
+4,Apple,12.9,apple.png
+5,Eggs,50,eggs.png
+6,Bread,9.5,bread.png
+7,Butter,30,butter.png
+8,Farfalle,38.6,farfalle.png
+9,Risotto,69,risotto.png
+10,Salmon,160,salmon.png
+11,Juice,20,juice.png
