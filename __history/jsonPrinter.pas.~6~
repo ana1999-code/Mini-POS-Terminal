@@ -50,13 +50,11 @@ begin
     // Add product array and total price to the main JSON object
     cartJsonObject.AddPair('products', AddProducts);
     cartJsonObject.AddPair('totalPrice', '$' + FloatToStr(FTotalPrice));
-                         // Create receipts directory if it does not exist
-      if not TDirectory.Exists(FReceiptsFolder) then
-        TDirectory.CreateDirectory(FReceiptsFolder);
+
     // Prepare the SaveDialog
     openSaveDialog.Title := 'Save Receipt As';
     openSaveDialog.Filter := 'JSON Files (*.json)|*.json';
-    openSaveDialog.InitialDir := FReceiptsFolder;
+    openSaveDialog.InitialDir := 'FReceiptsFolder';
 
     openSaveDialog.FileName := 'Receipt_' +
       FormatDateTime('yyyy-mm-dd_hh-nn-ss', dateTime) + '.json';
@@ -71,7 +69,9 @@ begin
     // Save the JSON to a file with a timestamp in its name
     if dialogResult then
     begin
-
+      // Create receipts directory if it does not exist
+      if not TDirectory.Exists(FReceiptsFolder) then
+        TDirectory.CreateDirectory(FReceiptsFolder);
 
       // Save the JSON to the selected file
       TFile.WriteAllText(fileName, cartJsonObject.Format,
