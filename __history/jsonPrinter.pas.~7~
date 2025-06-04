@@ -3,11 +3,10 @@ unit jsonPrinter;
 interface
 
 uses
-  System.Classes, Vcl.Dialogs, SysUtils, System.JSON, Vcl.Grids, System.IOUtils,
-  printer;
+  System.Classes, Vcl.Dialogs, SysUtils, System.JSON, Vcl.Grids, System.IOUtils, printer;
 
 type
-  // Class responsible for exporting the shopping cart data into a JSON file (receipt)
+// Class responsible for exporting the shopping cart data into a JSON file (receipt)
   TJsonPrinter = class(TInterfacedObject, IPrinter)
   private
     FCartGrid: TStringGrid;
@@ -39,7 +38,7 @@ var
   cartJsonObject: TJSONOBject;
   dateTime: TDateTime;
   openSaveDialog: TSaveDialog;
-  dialogResult: Boolean;
+  dialogResult : Boolean;
   fileName: string;
 begin
   cartJsonObject := TJSONOBject.Create;
@@ -51,37 +50,40 @@ begin
     // Add product array and total price to the main JSON object
     cartJsonObject.AddPair('products', AddProducts);
     cartJsonObject.AddPair('totalPrice', '$' + FloatToStr(FTotalPrice));
-
-    // Create receipts directory if it does not exist
-    if not TDirectory.Exists(FReceiptsFolder) then
-      TDirectory.CreateDirectory(FReceiptsFolder);
-
+                         // Create receipts directory if it does not exist
+      if not TDirectory.Exists(FReceiptsFolder) then
+        TDirectory.CreateDirectory(FReceiptsFolder);
     // Prepare the SaveDialog
     openSaveDialog.Title := 'Save Receipt As';
     openSaveDialog.Filter := 'JSON Files (*.json)|*.json';
     openSaveDialog.InitialDir := FReceiptsFolder;
 
-    openSaveDialog.fileName := 'Receipt_' +
+    openSaveDialog.FileName := 'Receipt_' +
       FormatDateTime('yyyy-mm-dd_hh-nn-ss', dateTime) + '.json';
 
-    TThread.Synchronize(nil,
+      TThread.Synchronize(nil,
       procedure
       begin
         dialogResult := openSaveDialog.Execute;
-        fileName := openSaveDialog.fileName;
+        fileName := openSaveDialog.FileName;
       end);
 
     // Save the JSON to a file with a timestamp in its name
     if dialogResult then
     begin
+
+
       // Save the JSON to the selected file
-      TFile.WriteAllText(fileName, cartJsonObject.Format, TEncoding.UTF8);
+      TFile.WriteAllText(fileName, cartJsonObject.Format,
+        TEncoding.UTF8);
     end;
   finally
     cartJsonObject.Free;
     openSaveDialog.Free;
   end;
 end;
+
+
 
 // Builds and returns a JSON array with all products from the cart
 function TJsonPrinter.AddProducts: TJSONArray;
@@ -100,7 +102,7 @@ end;
 
 // Creates a JSON object for a single product
 function TJsonPrinter.AddProduct(name: string; price: string; quantity: Integer;
-totalProdPrice: string): TJSONOBject;
+  totalProdPrice: string): TJSONOBject;
 var
   product: TJSONOBject;
 begin
