@@ -19,7 +19,7 @@ type
   public
     constructor Create(const ACartGrid: TStringGrid; const ATotalPrice: double;
       const AReceiptsFolder: string);
-    procedure PrintCartProductsToJsonFile;
+    function PrintCartProductsToJsonFile: Boolean;
   end;
 
 implementation
@@ -34,7 +34,7 @@ end;
 
 // Writes the cart products and total price to a JSON file
 // Writes the cart products and total price to a JSON file
-procedure TJsonPrinter.PrintCartProductsToJsonFile;
+function TJsonPrinter.PrintCartProductsToJsonFile: Boolean;
 var
   cartJsonObject: TJSONOBject;
   dateTime: TDateTime;
@@ -42,6 +42,7 @@ var
   dialogResult: Boolean;
   fileName: string;
 begin
+  Result := False;
   cartJsonObject := TJSONOBject.Create;
   openSaveDialog := TSaveDialog.Create(nil);
   dateTime := Now;
@@ -68,7 +69,7 @@ begin
       procedure
       begin
         dialogResult := openSaveDialog.Execute;
-        fileName := openSaveDialog.fileName;
+        fileName := openSaveDialog.FileName;
       end);
 
     // Save the JSON to a file with a timestamp in its name
@@ -76,6 +77,7 @@ begin
     begin
       // Save the JSON to the selected file
       TFile.WriteAllText(fileName, cartJsonObject.Format, TEncoding.UTF8);
+      Result := True;
     end;
   finally
     cartJsonObject.Free;

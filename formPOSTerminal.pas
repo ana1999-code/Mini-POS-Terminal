@@ -149,7 +149,7 @@ end;
 
 // Format cart grid header
 procedure TformProds.cartGridDrawCell(Sender: TObject; ACol, ARow: LongInt;
-Rect: TRect; State: TGridDrawState);
+  Rect: TRect; State: TGridDrawState);
 begin
   with cartGrid do
     with Canvas do
@@ -207,7 +207,8 @@ begin
       else
         Exit;
 
-      cartOperationService.HandleGridSelectCell(ACol, productName, productPrice);
+      cartOperationService.HandleGridSelectCell(ACol, productName,
+        productPrice);
       UpdateTotalPriceLabel;
     finally
       cartOperationService.Free;
@@ -238,18 +239,20 @@ begin
     procedure
     var
       printer: IPrinter;
+      isSaved: Boolean;
     begin
       printer := TJsonPrinter.Create(cartGrid, totalPrice, RECEIPTS_FOLDER);
       try
-        printer.PrintCartProductsToJsonFile;
+        isSaved := printer.PrintCartProductsToJsonFile;
 
         // Start a background thread to handle the logging operation asynchronously
-        TThread.CreateAnonymousThread(
-          procedure
-          begin
-            TLogger.LogToFile('sales.log', 'New sale completed. Total: ' +
-              FloatToStrF(totalPrice, ffCurrency, 8, 2));
-          end).Start;
+        if isSaved then
+          TThread.CreateAnonymousThread(
+            procedure
+            begin
+              TLogger.LogToFile('sales.log', 'New sale completed. Total: ' +
+                FloatToStrF(totalPrice, ffCurrency, 8, 2));
+            end).Start;
 
       except
         on E: Exception do
@@ -263,12 +266,20 @@ begin
       TThread.Synchronize(nil,
         procedure
         begin
-          frmProcessing.spnProcessing.Animate := False;
-          frmProcessing.spnProcessing.Visible := False;
-          frmProcessing.lbProcess.Caption := 'Receipt Succesfully Processed!';
-          frmProcessing.imgCheck.Visible := True;
-          frmProcessing.btnClose.Enabled := True;
-          CleanCartGrid;
+          if isSaved then
+          begin
+            frmProcessing.spnProcessing.Animate := False;
+            frmProcessing.spnProcessing.Visible := False;
+            frmProcessing.lbProcess.Caption := 'Receipt Succesfully Processed!';
+            frmProcessing.imgCheck.Visible := True;
+            frmProcessing.btnClose.Enabled := True;
+            CleanCartGrid;
+          end else
+          begin
+            frmProcessing.Close;
+            frmProcessing.Free;
+            tmrInactivity.Enabled := True;
+          end;
         end);
 
     end).Start;

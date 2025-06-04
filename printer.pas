@@ -4,7 +4,7 @@ interface
 type
 IPrinter = interface
 
-procedure PrintCartProductsToJsonFile;
+function PrintCartProductsToJsonFile: Boolean;
 end;
 
 implementation
