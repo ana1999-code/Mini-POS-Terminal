@@ -42,11 +42,12 @@ type
     procedure btnClearCartClick(Sender: TObject);
     procedure lbTotalPriceClick(Sender: TObject);
     procedure tmrInactivityTimer(Sender: TObject);
-    procedure prodsGridClick(Sender: TObject);
     procedure prodsGridSelectCell(Sender: TObject; ACol, ARow: LongInt;
       var CanSelect: Boolean);
     procedure cartGridSelectCell(Sender: TObject; ACol, ARow: LongInt;
       var CanSelect: Boolean);
+    procedure prodsGridMouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
 
   private
     { Private declarations }
@@ -146,39 +147,22 @@ begin
   end;
 end;
 
-// When a product cell is clicked, add or remove it in the cart
-procedure TformProds.prodsGridClick(Sender: TObject);
-var
-  P: TPoint;
-  ACol, ARow: LongInt;
-  productName: string;
-  productPrice: Double;
-  cartOperationService: TCartOperationService;
+// Format cart grid header
+procedure TformProds.cartGridDrawCell(Sender: TObject; ACol, ARow: LongInt;
+Rect: TRect; State: TGridDrawState);
 begin
-  P := prodsGrid.ScreenToClient(Mouse.CursorPos);
-  prodsGrid.MouseToCell(P.X, P.Y, ACol, ARow);
-  // Prevent invalid row or header click
-  if (ACol in [3, 4]) then
-  begin
-    tmrInactivity.Enabled := False;
-    cartOperationService := TCartOperationService.Create(cartGrid);
-    try
-      productName := prodsGrid.Cells[1, ARow];
-//
-      if productsMemTable.Locate('name', productName, []) then
-        productPrice := productsMemTable.FieldByName('price').AsFloat
-      else
-        Exit;
-//
-      cartOperationService.HandleGridSelectCell(ACol, productName,
-        productPrice);
-//
-      UpdateTotalPriceLabel;
-    finally
-      cartOperationService.Free;
-      tmrInactivity.Enabled := True;
+  with cartGrid do
+    with Canvas do
+    begin
+      if ARow = 0 then
+      begin
+        Font.Style := [fsBold];
+        Brush.Color := cl3DLight;
+        TextRect(Rect, Rect.Left + (Rect.Width - TextWidth(Cells[ACol, ARow]))
+          Div 2, Rect.Top + (Rect.Height - TextHeight(Cells[ACol, ARow])) Div 2,
+          Cells[ACol, ARow]);
+      end;
     end;
-  end;
 
 end;
 
@@ -195,6 +179,40 @@ begin
     prodImageCellDrawer.DrawCell(ACol, ARow, Rect);
   finally
     prodImageCellDrawer.Free;
+  end;
+end;
+
+// When a product + or - cell is clicked, add or remove it in the cart
+procedure TformProds.prodsGridMouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+var
+  ACol, ARow: LongInt;
+  productName: string;
+  productPrice: Double;
+  cartOperationService: TCartOperationService;
+begin
+  // Convert mouse position to cell coordinates
+  prodsGrid.MouseToCell(X, Y, ACol, ARow);
+
+  // Only act if mouse click is on column 3 (Add) or 4 (Remove) and a valid row
+  if (Button = mbLeft) and (ACol in [3, 4]) and (ARow >= 0) then
+  begin
+    tmrInactivity.Enabled := False;
+    cartOperationService := TCartOperationService.Create(cartGrid);
+    try
+      productName := prodsGrid.Cells[1, ARow];
+
+      if productsMemTable.Locate('name', productName, []) then
+        productPrice := productsMemTable.FieldByName('price').AsFloat
+      else
+        Exit;
+
+      cartOperationService.HandleGridSelectCell(ACol, productName, productPrice);
+      UpdateTotalPriceLabel;
+    finally
+      cartOperationService.Free;
+      tmrInactivity.Enabled := True;
+    end;
   end;
 end;
 
@@ -254,25 +272,6 @@ begin
         end);
 
     end).Start;
-end;
-
-// Format cart grid header cells
-procedure TformProds.cartGridDrawCell(Sender: TObject; ACol, ARow: LongInt;
-Rect: TRect; State: TGridDrawState);
-begin
-  with cartGrid do
-    with Canvas do
-    begin
-      if ARow = 0 then
-      begin
-        Font.Style := [fsBold];
-        Brush.Color := cl3DLight;
-        TextRect(Rect, Rect.Left + (Rect.Width - TextWidth(Cells[ACol, ARow]))
-          Div 2, Rect.Top + (Rect.Height - TextHeight(Cells[ACol, ARow])) Div 2,
-          Cells[ACol, ARow]);
-      end;
-    end;
-
 end;
 
 procedure TformProds.cartGridSelectCell(Sender: TObject; ACol, ARow: LongInt;
@@ -340,6 +339,7 @@ begin
     end).Start;
 end;
 
+// Clear the cart on user inactivity
 procedure TformProds.tmrInactivityTimer(Sender: TObject);
 var
   InactivityDialog: TfrmInactivityDialog;

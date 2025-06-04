@@ -195,7 +195,7 @@ begin
   prodsGrid.MouseToCell(X, Y, ACol, ARow);
 
   // Only act if mouse click is on column 3 (Add) or 4 (Remove) and a valid row
-  if (Button = mbLeft) and (ACol in [3, 4]) and (ARow >= 0) then
+  if (Button = mbLeft) and (ACol in [3, 4]) then
   begin
     tmrInactivity.Enabled := False;
     cartOperationService := TCartOperationService.Create(cartGrid);
