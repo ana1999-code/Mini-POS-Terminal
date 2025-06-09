@@ -33,7 +33,6 @@ begin
 end;
 
 // Writes the cart products and total price to a JSON file
-// Writes the cart products and total price to a JSON file
 function TJsonPrinter.PrintCartProductsToJsonFile: Boolean;
 var
   cartJsonObject: TJSONOBject;

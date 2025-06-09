@@ -67,7 +67,7 @@ var
   Initialized: Boolean = False;
 
 const
-  PRODUCTS_FILE = 'Data\products.txt';
+  PRODUCTS_FILE = 'Data\producs.txt';
   IMAGES_FOLDER = 'Images';
   RECEIPTS_FOLDER = 'Receipts';
 
@@ -274,7 +274,8 @@ begin
             frmProcessing.imgCheck.Visible := True;
             frmProcessing.btnClose.Enabled := True;
             CleanCartGrid;
-          end else
+          end
+          else
           begin
             frmProcessing.Close;
             frmProcessing.Free;
@@ -371,10 +372,7 @@ begin
     if not InactivityDialog.Cancelled then
     begin
       // Cleanup after dialog closes
-      cartGrid.RowCount := 1;
-      totalPrice := 0;
-      lbTotalPrice.Caption := 'Total: ' + FloatToStrF(totalPrice,
-        ffCurrency, 8, 2);
+      CleanCartGrid();
     end;
     tmrInactivity.Enabled := True;
   end;

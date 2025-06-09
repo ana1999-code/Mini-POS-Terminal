@@ -51,7 +51,7 @@ procedure TfrmInactivityDialog.CountdownTimerTimer(Sender: TObject);
 begin
   Dec(FSecondsLeft);
   if FSecondsLeft > 0 then
-    lblCountdown.Caption := 'Clearing data in ' + IntToStr(FSecondsLeft) +
+    lblCountdown.Caption := 'Clearing cart in ' + IntToStr(FSecondsLeft) +
       ' seconds...'
   else
   begin
